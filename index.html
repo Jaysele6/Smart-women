@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Smart Women</title>
+  <meta name="description" content="Smart Women helps women understand their bodies through cycle tracking, pregnancy guidance, symptom logging, and educational content." />
+
+  <style>
+    :root{
+      --bg:#0b0b12;
+      --panel:#111225;
+      --card:#141634;
+      --text:#f4f5ff;
+      --muted:#b9bce6;
+      --brand:#9b5cff;
+      --brand2:#ff4fa3;
+      --line:rgba(255,255,255,.10);
+      --shadow: 0 12px 40px rgba(0,0,0,.35);
+      --radius:18px;
+    }
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji";
+      background:
+        radial-gradient(900px 500px at 15% 5%, rgba(155,92,255,.30), transparent 65%),
+        radial-gradient(900px 500px at 85% 10%, rgba(255,79,163,.25), transparent 60%),
+        radial-gradient(1000px 600px at 50% 95%, rgba(155,92,255,.18), transparent 55%),
+        var(--bg);
+      color:var(--text);
+      line-height:1.6;
+    }
+    a{ color:inherit; text-decoration:none; }
+    .wrap{ max-width:1100px; margin:0 auto; padding:0 18px; }
+
+    /* Topbar */
+    .topbar{
+      position:sticky; top:0;
+      backdrop-filter: blur(12px);
+      background: rgba(11,11,18,.55);
+      border-bottom:1px solid var(--line);
+      z-index:20;
+    }
+    .nav{
+      display:flex; align-items:center; justify-content:space-between;
+      padding:14px 0;
+      gap:14px;
+    }
+    .brand{
+      display:flex; align-items:center; gap:10px;
+      font-weight:800; letter-spacing:.3px;
+    }
+    .logo{
+      width:38px; height:38px;
+      border-radius:12px;
+      background: linear-gradient(135deg, var(--brand), var(--brand2));
+      box-shadow: 0 10px 30px rgba(155,92,255,.25);
+      position:relative;
+    }
+    .logo:after{
+      content:"";
+      position:absolute; inset:10px;
+      border-radius:10px;
+      background: rgba(255,255,255,.12);
+    }
+    .navlinks{
+      display:flex; gap:18px;
+      font-weight:600; color:var(--muted);
+      flex-wrap:wrap;
+      justify-content:flex-end;
+    }
+    .navlinks a{
+      padding:8px 10px; border-radius:12px;
+      border:1px solid transparent;
+    }
+    .navlinks a:hover{
+      color:var(--text);
+      border-color: rgba(255,255,255,.12);
+      background: rgba(255,255,255,.04);
+    }
+
+    /* Hero */
+    .hero{
+      padding:64px 0 26px;
+    }
+    .heroGrid{
+      display:grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap:22px;
+      align-items:stretch;
+    }
+    .pill{
+      display:inline-flex; gap:8px; align-items:center;
+      padding:8px 12px;
+      border-radius:999px;
+      background: rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.12);
+      color:var(--muted);
+      font-weight:600;
+      width:fit-content;
+    }
+    .dot{
+      width:10px; height:10px; border-radius:50%;
+      background: linear-gradient(135deg, var(--brand), var(--brand2));
+      box-shadow:0 0 0 4px rgba(155,92,255,.15);
+    }
+    h1{
+      margin:16px 0 10px;
+      font-size: clamp(34px, 4.3vw, 56px);
+      line-height:1.05;
+      letter-spacing:-.7px;
+    }
+    .lead{
+      margin: 0 0 18px;
+      color: var(--muted);
+      font-size: 1.05rem;
+      max-width: 52ch;
+    }
+    .ctaRow{
+      display:flex; gap:12px; flex-wrap:wrap;
+      margin-top:18px;
+    }
+    .btn{
+      display:inline-flex; align-items:center; justify-content:center;
+      gap:10px;
+      padding:12px 16px;
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      color: var(--text);
+      font-weight:700;
+      box-shadow: 0 10px 24px rgba(0,0,0,.18);
+    }
+    .btn.primary{
+      border: none;
+      background: linear-gradient(135deg, var(--brand), var(--brand2));
+    }
+    .btn:hover{ transform: translateY(-1px); transition:.15s ease; }
+
+    .panel{
+      border-radius: var(--radius);
+      background: rgba(17,18,37,.72);
+      border:1px solid rgba(255,255,255,.12);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .panelInner{ padding:18px; }
+    .stats{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:12px;
+      margin-top:14px;
+    }
+    .stat{
+      padding:14px;
+      border-radius:16px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.04);
+    }
+    .stat b{ display:block; font-size:1.15rem; }
+    .stat span{ color:var(--muted); font-weight:600; font-size:.92rem; }
+
+    /* Sections */
+    section{ padding: 28px 0; }
+    .sectionTitle{
+      display:flex; align-items:flex-end; justify-content:space-between;
+      gap:14px; flex-wrap:wrap;
+      margin-bottom:12px;
+    }
+    .sectionTitle h2{
+      margin:0;
+      font-size: 1.6rem;
+      letter-spacing:-.3px;
+    }
+    .sectionTitle p{
+      margin:0;
+      color: var(--muted);
+      max-width: 60ch;
+      font-weight:600;
+    }
+
+    .cards{
+      display:grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap:14px;
+    }
+    .card{
+      border-radius: var(--radius);
+      background: rgba(20,22,52,.72);
+      border:1px solid rgba(255,255,255,.10);
+      box-shadow: 0 10px 28px rgba(0,0,0,.20);
+      padding:18px;
+      min-height: 150px;
+    }
+    .icon{
+      width:40px; height:40px; border-radius:14px;
+      display:grid; place-items:center;
+      background: rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.12);
+      margin-bottom:12px;
+      font-size:18px;
+    }
+    .card h3{ margin:0 0 6px; font-size:1.1rem; }
+    .card p{ margin:0; color:var(--muted); font-weight:600; }
+
+    .split{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:14px;
+      align-items:start;
+    }
+    .box{
+      border-radius: var(--radius);
+      background: rgba(20,22,52,.62);
+      border:1px solid rgba(255,255,255,.10);
+      padding:18px;
+    }
+    .box h3{ margin:0 0 8px; }
+    .box p{ margin:0; color:var(--muted); font-weight:600; }
+    .list{
+      margin:12px 0 0;
+      padding:0;
+      list-style:none;
+    }
+    .list li{
+      margin:10px 0;
+      padding-left: 18px;
+      position:relative;
+      color: var(--muted);
+      font-weight:600;
+    }
+    .list li:before{
+      content:"";
+      position:absolute; left:0; top:.55em;
+      width:8px; height:8px; border-radius:50%;
+      background: linear-gradient(135deg, var(--brand), var(--brand2));
+    }
+
+    /* Contact */
+    .contactGrid{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:14px;
+    }
+    .contactItem{
+      display:flex; gap:12px; align-items:flex-start;
+      padding:16px;
+      border-radius: var(--radius);
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.04);
+    }
+    .contactItem b{ display:block; margin-bottom:4px; }
+    .contactItem span{ color:var(--muted); font-weight:600; }
+
+    /* Footer */
+    footer{
+      border-top:1px solid var(--line);
+      margin-top: 22px;
+      padding: 22px 0 30px;
+      color: var(--muted);
+      text-align:center;
+      font-weight:600;
+    }
+
+    /* Responsive */
+    @media (max-width: 920px){
+      .heroGrid{ grid-template-columns: 1fr; }
+      .cards{ grid-template-columns: 1fr; }
+      .split{ grid-template-columns: 1fr; }
+      .contactGrid{ grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="topbar">
+    <div class="wrap">
+      <div class="nav">
+        <div class="brand">
+          <div class="logo" aria-hidden="true"></div>
+          <div>
+            <div style="font-size:1.05rem;">Smart Women</div>
+            <div style="color:var(--muted); font-weight:700; font-size:.82rem;">Women’s health & wellness</div>
+          </div>
+        </div>
+
+        <div class="navlinks">
+          <a href="#about">About</a>
+          <a href="#features">Features</a>
+          <a href="#privacy">Privacy</a>
+          <a href="#contact">Contact</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="wrap">
+      <div class="heroGrid">
+        <div class="panel">
+          <div class="panelInner">
+            <div class="pill"><span class="dot"></span> Trusted support for understanding your body</div>
+            <h1>Empowering women to know their bodies, take control, and live confidently.</h1>
+            <p class="lead">
+              Smart Women is built to help women track their cycle and pregnancy, understand symptoms,
+              and learn practical health guidance—so every woman can make informed choices about her body
+              with clarity, dignity, and confidence.
+            </p>
+
+            <div class="ctaRow">
+              <a class="btn primary" href="#features">Explore Features</a>
+              <a class="btn" href="#privacy">Read Privacy Policy</a>
+            </div>
+
+            <div class="stats">
+              <div class="stat">
+                <b>Track & Learn</b>
+                <span>Cycle • Pregnancy • Symptoms</span>
+              </div>
+              <div class="stat">
+                <b>Private by Design</b>
+                <span>Your data stays on your device</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panelInner">
+            <h2 style="margin:0 0 10px;">Our Promise</h2>
+            <p style="margin:0; color:var(--muted); font-weight:600;">
+              We focus on education, guidance, and self-awareness. Smart Women is not a replacement
+              for professional medical advice—always consult a qualified health provider when needed.
+            </p>
+
+            <ul class="list">
+              <li>Clear and respectful health education</li>
+              <li>Supportive tracking tools for everyday life</li>
+              <li>Designed for women who want to understand their bodies</li>
+            </ul>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ABOUT -->
+  <section id="about">
+    <div class="wrap">
+      <div class="sectionTitle">
+        <h2>About Us</h2>
+        <p>
+          Our mission is to help women become better, healthier, and more confident by understanding
+          their bodies—one day at a time.
+        </p>
+      </div>
+
+      <div class="split">
+        <div class="box">
+          <h3>Who we are</h3>
+          <p>
+            Smart Women is a women’s health and wellness project created to support everyday women with
+            practical tools and education. We believe every woman deserves clear, respectful information
+            about her body—without shame, fear, or confusion.
+          </p>
+        </div>
+
+        <div class="box">
+          <h3>Our goal</h3>
+          <p>
+            To empower women to recognise body changes early, track important health patterns, and make
+            informed decisions. Whether it’s menstrual cycle awareness, pregnancy support, or symptom tracking,
+            we aim to make women feel supported and in control.
+          </p>
+          <ul class="list">
+            <li>Build body awareness and confidence</li>
+            <li>Encourage healthy habits and self-care</li>
+            <li>Promote early action when something feels unusual</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section id="features">
+    <div class="wrap">
+      <div class="sectionTitle">
+        <h2>Key Features</h2>
+        <p>Simple tools designed to help you track, learn, and care for your health—privately.</p>
+      </div>
+
+      <div class="cards">
+        <div class="card">
+          <div class="icon">🗓️</div>
+          <h3>Cycle Tracking</h3>
+          <p>Track your menstrual cycle, daily symptoms, and understand what’s happening in your body.</p>
+        </div>
+
+        <div class="card">
+          <div class="icon">🤰</div>
+          <h3>Pregnancy Support</h3>
+          <p>Follow pregnancy progress with helpful weekly guidance and important reminders.</p>
+        </div>
+
+        <div class="card">
+          <div class="icon">📝</div>
+          <h3>Symptom & Activity Log</h3>
+          <p>Log symptoms and other health notes (including optional sex activity) to understand patterns.</p>
+        </div>
+
+        <div class="card">
+          <div class="icon">📚</div>
+          <h3>Health Education</h3>
+          <p>Clear educational content that helps you make informed, confident choices.</p>
+        </div>
+
+        <div class="card">
+          <div class="icon">🔒</div>
+          <h3>Privacy First</h3>
+          <p>Your personal health data is stored locally on your device. You control it.</p>
+        </div>
+
+        <div class="card">
+          <div class="icon">⭐</div>
+          <h3>Premium Features</h3>
+          <p>Optional subscription to unlock premium tools (payments handled by Google Play).</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRIVACY POLICY -->
+  <section id="privacy">
+    <div class="wrap">
+      <div class="sectionTitle">
+        <h2>Privacy Policy</h2>
+        <p>We respect your privacy. This explains what we collect and how we use it.</p>
+      </div>
+
+      <div class="box">
+        <p style="margin-top:0;"><strong>Last updated:</strong> 2026-02-04</p>
+
+        <h3>1) Information We Collect</h3>
+        <ul class="list">
+          <li><strong>Name</strong> (optional, for profile)</li>
+          <li><strong>Profile photo</strong> (optional)</li>
+          <li><strong>Health information</strong> (cycle, pregnancy, symptoms, and optional sex activity)</li>
+          <li><strong>In-app messages</strong> and other user-generated content</li>
+          <li><strong>Purchase history</strong> (subscriptions handled by Google Play Billing)</li>
+          <li><strong>Device identifiers</strong> and diagnostics (used by Google services such as ads and billing)</li>
+        </ul>
+
+        <h3>2) How We Use Your Data</h3>
+        <ul class="list">
+          <li>To provide app functionality (tracking, reminders, guidance)</li>
+          <li>To personalise your experience (based on your entries)</li>
+          <li>To process subscriptions and verify purchases via Google Play</li>
+          <li>To improve app stability and performance (crash logs and diagnostics)</li>
+        </ul>
+
+        <h3>3) Data Storage</h3>
+        <p style="color:var(--muted); font-weight:600;">
+          Personal and health data you enter is stored locally on your device. We do not run our own user account system.
+          You can remove your data by clearing app storage or uninstalling the app.
+        </p>
+
+        <h3>4) Third-Party Services</h3>
+        <p style="color:var(--muted); font-weight:600;">
+          Smart Women uses Google services such as Google Play Billing and Google Mobile Ads. These services may collect
+          device identifiers and usage data under their own privacy policies.
+        </p>
+
+        <h3>5) Data Sharing</h3>
+        <p style="color:var(--muted); font-weight:600;">
+          We do not sell your personal data. We do not share your personal or health entries with third parties, except
+          for data required to operate Google services (billing/ads/diagnostics).
+        </p>
+
+        <h3>6) Security</h3>
+        <p style="color:var(--muted); font-weight:600;">
+          Data transmitted off-device is encrypted in transit using secure protocols (HTTPS/TLS) where applicable.
+        </p>
+
+        <h3>7) Children’s Privacy</h3>
+        <p style="color:var(--muted); font-weight:600;">
+          Smart Women is intended for users aged 18 and over. We do not knowingly collect personal information from children.
+        </p>
+
+        <h3>8) Contact</h3>
+        <p style="color:var(--muted); font-weight:600; margin-bottom:0;">
+          If you have questions about this Privacy Policy, contact us at:
+          <br><strong>Email:</strong> <a href="mailto:jayselejk@gmail.com">jayselejk@gmail.com</a>
+          <br><strong>WhatsApp:</strong> <a href="https://wa.me/255747947995" target="_blank">+255 747 947 995</a>
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section id="contact">
+    <div class="wrap">
+      <div class="sectionTitle">
+        <h2>Contact</h2>
+        <p>Need help, feedback, or partnership? Reach out.</p>
+      </div>
+
+      <div class="contactGrid">
+        <div class="contactItem">
+          <div class="icon" style="margin:0;">💬</div>
+          <div>
+            <b>WhatsApp</b>
+            <span><a href="https://wa.me/255747947995" target="_blank">+255 747 947 995</a></span>
+          </div>
+        </div>
+
+        <div class="contactItem">
+          <div class="icon" style="margin:0;">📩</div>
+          <div>
+            <b>Email</b>
+            <span><a href="mailto:jayselejk@gmail.com">jayselejk@gmail.com</a></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="box" style="margin-top:14px;">
+        <h3 style="margin-top:0;">Follow us</h3>
+        <p style="margin:0; color:var(--muted); font-weight:600;">
+          Add your social links here (Instagram, Facebook, TikTok). This site is static—no accounts, no tracking.
+        </p>
+        <div class="ctaRow" style="margin-top:12px;">
+          <a class="btn" href="#" onclick="return false;">Instagram</a>
+          <a class="btn" href="#" onclick="return false;">Facebook</a>
+          <a class="btn" href="#" onclick="return false;">TikTok</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="wrap">
+      © 2026 Smart Women • All rights reserved
+    </div>
+  </footer>
+</body>
+</html>
