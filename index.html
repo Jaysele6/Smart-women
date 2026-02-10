@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Smart Women</title>
-  <meta name="description" content="Smart Women helps women understand their bodies through cycle tracking, pregnancy guidance, symptom logging, and educational content." />
+  <title>Smart Woman</title>
+  <meta name="description" content="Smart Woman helps women understand their bodies through cycle tracking, pregnancy guidance, symptom logging, and educational content." />
 
   <style>
     :root{
@@ -18,8 +18,10 @@
       --line:rgba(255,255,255,.10);
       --shadow: 0 12px 40px rgba(0,0,0,.35);
       --radius:18px;
+      --focus: rgba(155,92,255,.35);
     }
     *{ box-sizing:border-box; }
+    html{ scroll-behavior:smooth; }
     body{
       margin:0;
       font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji";
@@ -41,6 +43,12 @@
       background: rgba(11,11,18,.55);
       border-bottom:1px solid var(--line);
       z-index:20;
+    }
+    .progressBar{
+      height:3px;
+      background: linear-gradient(90deg, var(--brand), var(--brand2));
+      width: 0%;
+      transform-origin:left;
     }
     .nav{
       display:flex; align-items:center; justify-content:space-between;
@@ -73,17 +81,25 @@
     .navlinks a{
       padding:8px 10px; border-radius:12px;
       border:1px solid transparent;
+      outline: none;
     }
     .navlinks a:hover{
       color:var(--text);
       border-color: rgba(255,255,255,.12);
       background: rgba(255,255,255,.04);
     }
+    .navlinks a.active{
+      color: var(--text);
+      border-color: rgba(255,255,255,.18);
+      background: rgba(255,255,255,.06);
+      box-shadow: 0 0 0 4px rgba(155,92,255,.10);
+    }
+    .navlinks a:focus-visible{
+      box-shadow: 0 0 0 4px var(--focus);
+    }
 
     /* Hero */
-    .hero{
-      padding:64px 0 26px;
-    }
+    .hero{ padding:64px 0 26px; }
     .heroGrid{
       display:grid;
       grid-template-columns: 1.2fr .8fr;
@@ -131,12 +147,14 @@
       color: var(--text);
       font-weight:700;
       box-shadow: 0 10px 24px rgba(0,0,0,.18);
+      cursor:pointer;
+      transition: transform .15s ease, filter .15s ease;
     }
     .btn.primary{
       border: none;
       background: linear-gradient(135deg, var(--brand), var(--brand2));
     }
-    .btn:hover{ transform: translateY(-1px); transition:.15s ease; }
+    .btn:hover{ transform: translateY(-1px); }
 
     .panel{
       border-radius: var(--radius);
@@ -162,17 +180,13 @@
     .stat span{ color:var(--muted); font-weight:600; font-size:.92rem; }
 
     /* Sections */
-    section{ padding: 28px 0; }
+    section{ padding: 28px 0; scroll-margin-top: 84px; }
     .sectionTitle{
       display:flex; align-items:flex-end; justify-content:space-between;
       gap:14px; flex-wrap:wrap;
       margin-bottom:12px;
     }
-    .sectionTitle h2{
-      margin:0;
-      font-size: 1.6rem;
-      letter-spacing:-.3px;
-    }
+    .sectionTitle h2{ margin:0; font-size: 1.6rem; letter-spacing:-.3px; }
     .sectionTitle p{
       margin:0;
       color: var(--muted);
@@ -258,9 +272,42 @@
       border-top:1px solid var(--line);
       margin-top: 22px;
       padding: 22px 0 30px;
-      color: var(--muted);
+      color:var(--muted);
       text-align:center;
       font-weight:600;
+    }
+
+    /* Reveal animations */
+    .reveal{
+      opacity: 0;
+      transform: translateY(14px);
+      transition: opacity .55s ease, transform .55s ease;
+    }
+    .reveal.show{
+      opacity: 1;
+      transform: translateY(0);
+    }
+    @media (prefers-reduced-motion: reduce){
+      html{ scroll-behavior:auto; }
+      .btn{ transition:none; }
+      .reveal{ opacity:1; transform:none; transition:none; }
+    }
+
+    /* Back to top */
+    .toTop{
+      position: fixed;
+      right: 16px;
+      bottom: 16px;
+      z-index: 30;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(8px);
+      transition: opacity .2s ease, transform .2s ease;
+    }
+    .toTop.show{
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateY(0);
     }
 
     /* Responsive */
@@ -275,21 +322,22 @@
 
 <body>
   <div class="topbar">
+    <div class="progressBar" id="progressBar" aria-hidden="true"></div>
     <div class="wrap">
       <div class="nav">
         <div class="brand">
           <div class="logo" aria-hidden="true"></div>
           <div>
-            <div style="font-size:1.05rem;">Smart Women</div>
+            <div style="font-size:1.05rem;">Smart Woman</div>
             <div style="color:var(--muted); font-weight:700; font-size:.82rem;">Women’s health & wellness</div>
           </div>
         </div>
 
-        <div class="navlinks">
-          <a href="#about">About</a>
-          <a href="#features">Features</a>
-          <a href="#privacy">Privacy</a>
-          <a href="#contact">Contact</a>
+        <div class="navlinks" id="navlinks">
+          <a href="#about" data-link="about">About</a>
+          <a href="#features" data-link="features">Features</a>
+          <a href="#privacy" data-link="privacy">Privacy</a>
+          <a href="#contact" data-link="contact">Contact</a>
         </div>
       </div>
     </div>
@@ -299,18 +347,23 @@
   <div class="hero">
     <div class="wrap">
       <div class="heroGrid">
-        <div class="panel">
+        <div class="panel reveal">
           <div class="panelInner">
             <div class="pill"><span class="dot"></span> Trusted support for understanding your body</div>
             <h1>Empowering women to know their bodies, take control, and live confidently.</h1>
             <p class="lead">
-              Smart Women is built to help women track their cycle and pregnancy, understand symptoms,
+              Smart Woman is built to help women track their cycle and pregnancy, understand symptoms,
               and learn practical health guidance—so every woman can make informed choices about her body
               with clarity, dignity, and confidence.
             </p>
 
             <div class="ctaRow">
-              <a class="btn primary" href="#features">Explore Features</a>
+              <!-- ✅ PLACEHOLDER: replace the href with your real Google Play link -->
+              <a class="btn primary" id="downloadBtn" href="https://play.google.com/store/apps/details?id=YOUR_APP_ID" target="_blank" rel="noopener">
+                ⬇️ Download on Google Play
+              </a>
+
+              <a class="btn" href="#features">Explore Features</a>
               <a class="btn" href="#privacy">Read Privacy Policy</a>
             </div>
 
@@ -327,11 +380,11 @@
           </div>
         </div>
 
-        <div class="panel">
+        <div class="panel reveal">
           <div class="panelInner">
             <h2 style="margin:0 0 10px;">Our Promise</h2>
             <p style="margin:0; color:var(--muted); font-weight:600;">
-              We focus on education, guidance, and self-awareness. Smart Women is not a replacement
+              We focus on education, guidance, and self-awareness. Smart Woman is not a replacement
               for professional medical advice—always consult a qualified health provider when needed.
             </p>
 
@@ -348,7 +401,7 @@
   </div>
 
   <!-- ABOUT -->
-  <section id="about">
+  <section id="about" class="reveal">
     <div class="wrap">
       <div class="sectionTitle">
         <h2>About Us</h2>
@@ -359,16 +412,16 @@
       </div>
 
       <div class="split">
-        <div class="box">
+        <div class="box reveal">
           <h3>Who we are</h3>
           <p>
-            Smart Women is a women’s health and wellness project created to support everyday women with
+            Smart Woman is a women’s health and wellness project created to support everyday women with
             practical tools and education. We believe every woman deserves clear, respectful information
             about her body—without shame, fear, or confusion.
           </p>
         </div>
 
-        <div class="box">
+        <div class="box reveal">
           <h3>Our goal</h3>
           <p>
             To empower women to recognise body changes early, track important health patterns, and make
@@ -386,7 +439,7 @@
   </section>
 
   <!-- FEATURES -->
-  <section id="features">
+  <section id="features" class="reveal">
     <div class="wrap">
       <div class="sectionTitle">
         <h2>Key Features</h2>
@@ -394,37 +447,37 @@
       </div>
 
       <div class="cards">
-        <div class="card">
+        <div class="card reveal">
           <div class="icon">🗓️</div>
           <h3>Cycle Tracking</h3>
           <p>Track your menstrual cycle, daily symptoms, and understand what’s happening in your body.</p>
         </div>
 
-        <div class="card">
+        <div class="card reveal">
           <div class="icon">🤰</div>
           <h3>Pregnancy Support</h3>
           <p>Follow pregnancy progress with helpful weekly guidance and important reminders.</p>
         </div>
 
-        <div class="card">
+        <div class="card reveal">
           <div class="icon">📝</div>
           <h3>Symptom & Activity Log</h3>
           <p>Log symptoms and other health notes (including optional sex activity) to understand patterns.</p>
         </div>
 
-        <div class="card">
+        <div class="card reveal">
           <div class="icon">📚</div>
           <h3>Health Education</h3>
           <p>Clear educational content that helps you make informed, confident choices.</p>
         </div>
 
-        <div class="card">
+        <div class="card reveal">
           <div class="icon">🔒</div>
           <h3>Privacy First</h3>
           <p>Your personal health data is stored locally on your device. You control it.</p>
         </div>
 
-        <div class="card">
+        <div class="card reveal">
           <div class="icon">⭐</div>
           <h3>Premium Features</h3>
           <p>Optional subscription to unlock premium tools (payments handled by Google Play).</p>
@@ -434,14 +487,14 @@
   </section>
 
   <!-- PRIVACY POLICY -->
-  <section id="privacy">
+  <section id="privacy" class="reveal">
     <div class="wrap">
       <div class="sectionTitle">
         <h2>Privacy Policy</h2>
         <p>We respect your privacy. This explains what we collect and how we use it.</p>
       </div>
 
-      <div class="box">
+      <div class="box reveal">
         <p style="margin-top:0;"><strong>Last updated:</strong> 2026-02-04</p>
 
         <h3>1) Information We Collect</h3>
@@ -470,7 +523,7 @@
 
         <h3>4) Third-Party Services</h3>
         <p style="color:var(--muted); font-weight:600;">
-          Smart Women uses Google services such as Google Play Billing and Google Mobile Ads. These services may collect
+          Smart Woman uses Google services such as Google Play Billing and Google Mobile Ads. These services may collect
           device identifiers and usage data under their own privacy policies.
         </p>
 
@@ -487,21 +540,21 @@
 
         <h3>7) Children’s Privacy</h3>
         <p style="color:var(--muted); font-weight:600;">
-          Smart Women is intended for users aged 18 and over. We do not knowingly collect personal information from children.
+          Smart Woman is intended for users aged 18 and over. We do not knowingly collect personal information from children.
         </p>
 
         <h3>8) Contact</h3>
         <p style="color:var(--muted); font-weight:600; margin-bottom:0;">
           If you have questions about this Privacy Policy, contact us at:
           <br><strong>Email:</strong> <a href="mailto:jayselejk@gmail.com">jayselejk@gmail.com</a>
-          <br><strong>WhatsApp:</strong> <a href="https://wa.me/255747947995" target="_blank">+255 747 947 995</a>
+          <br><strong>WhatsApp:</strong> <a href="https://wa.me/255747947995" target="_blank" rel="noopener">+255 747 947 995</a>
         </p>
       </div>
     </div>
   </section>
 
   <!-- CONTACT -->
-  <section id="contact">
+  <section id="contact" class="reveal">
     <div class="wrap">
       <div class="sectionTitle">
         <h2>Contact</h2>
@@ -509,15 +562,15 @@
       </div>
 
       <div class="contactGrid">
-        <div class="contactItem">
+        <div class="contactItem reveal">
           <div class="icon" style="margin:0;">💬</div>
           <div>
             <b>WhatsApp</b>
-            <span><a href="https://wa.me/255747947995" target="_blank">+255 747 947 995</a></span>
+            <span><a href="https://wa.me/255747947995" target="_blank" rel="noopener">+255 747 947 995</a></span>
           </div>
         </div>
 
-        <div class="contactItem">
+        <div class="contactItem reveal">
           <div class="icon" style="margin:0;">📩</div>
           <div>
             <b>Email</b>
@@ -526,12 +579,17 @@
         </div>
       </div>
 
-      <div class="box" style="margin-top:14px;">
-        <h3 style="margin-top:0;">Follow us</h3>
+      <div class="box reveal" style="margin-top:14px;">
+        <h3 style="margin-top:0;">Get the app</h3>
         <p style="margin:0; color:var(--muted); font-weight:600;">
-          Add your social links here (Instagram, Facebook, TikTok). This site is static—no accounts, no tracking.
+          Download Smart Woman and start tracking your cycle, pregnancy, and symptoms with privacy-first design.
         </p>
+
         <div class="ctaRow" style="margin-top:12px;">
+          <!-- ✅ PLACEHOLDER: replace the href with your real Google Play link -->
+          <a class="btn primary" href="https://play.google.com/store/apps/details?id=YOUR_APP_ID" target="_blank" rel="noopener">
+            ⬇️ Download on Google Play
+          </a>
           <a class="btn" href="#" onclick="return false;">Instagram</a>
           <a class="btn" href="#" onclick="return false;">Facebook</a>
           <a class="btn" href="#" onclick="return false;">TikTok</a>
@@ -540,10 +598,91 @@
     </div>
   </section>
 
+  <button class="btn toTop" id="toTop" aria-label="Back to top">⬆️ Top</button>
+
   <footer>
     <div class="wrap">
-      © 2026 Smart Women • All rights reserved
+      © <span id="year">2026</span> Smart Woman • All rights reserved
     </div>
   </footer>
+
+  <script>
+    // Auto year
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    // Back to top
+    const toTop = document.getElementById('toTop');
+    toTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+    // Progress bar
+    const progressBar = document.getElementById('progressBar');
+    function updateProgress(){
+      const doc = document.documentElement;
+      const scrollTop = doc.scrollTop || document.body.scrollTop;
+      const scrollHeight = doc.scrollHeight - doc.clientHeight;
+      const p = scrollHeight > 0 ? (scrollTop / scrollHeight) * 100 : 0;
+      progressBar.style.width = p.toFixed(2) + '%';
+
+      if (scrollTop > 500) toTop.classList.add('show');
+      else toTop.classList.remove('show');
+    }
+
+    // Reveal on scroll
+    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const revealEls = Array.from(document.querySelectorAll('.reveal'));
+    if (!prefersReduced && 'IntersectionObserver' in window) {
+      const io = new IntersectionObserver((entries) => {
+        entries.forEach(e => {
+          if (e.isIntersecting) {
+            e.target.classList.add('show');
+            io.unobserve(e.target);
+          }
+        });
+      }, { threshold: 0.12 });
+      revealEls.forEach(el => io.observe(el));
+    } else {
+      revealEls.forEach(el => el.classList.add('show'));
+    }
+
+    // Active nav link
+    const sections = ['about','features','privacy','contact']
+      .map(id => document.getElementById(id))
+      .filter(Boolean);
+
+    const navlinks = Array.from(document.querySelectorAll('#navlinks a[data-link]'));
+
+    function setActive(id){
+      navlinks.forEach(a => a.classList.toggle('active', a.dataset.link === id));
+    }
+
+    if ('IntersectionObserver' in window) {
+      const sectionIO = new IntersectionObserver((entries) => {
+        const visible = entries
+          .filter(e => e.isIntersecting)
+          .sort((a,b) => (b.intersectionRatio - a.intersectionRatio))[0];
+        if (visible && visible.target && visible.target.id) setActive(visible.target.id);
+      }, { rootMargin: '-25% 0px -60% 0px', threshold: [0.1, 0.25, 0.5] });
+
+      sections.forEach(s => sectionIO.observe(s));
+    } else {
+      navlinks.forEach(a => a.addEventListener('click', () => setActive(a.dataset.link)));
+    }
+
+    // Throttled scroll
+    let ticking = false;
+    window.addEventListener('scroll', () => {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          updateProgress();
+          ticking = false;
+        });
+        ticking = true;
+      }
+    }, { passive: true });
+
+    // initial
+    updateProgress();
+    setActive('about');
+  </script>
 </body>
 </html>
